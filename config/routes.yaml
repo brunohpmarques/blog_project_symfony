@@ -1,0 +1,3 @@
+#index:
+#    path: /api/version
+#    controller: App\Controller\FirstController::version
