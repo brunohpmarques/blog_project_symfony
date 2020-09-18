@@ -1,2 +1,2 @@
-# blog_project_symfony
+# Blog Project with Symfony
 A simple project with Symfony
