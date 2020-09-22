@@ -66,4 +66,18 @@ class CategoryController extends AbstractController
 
         return $this->json($this->toDto($category));
     }
+
+    /**
+     * @Route("/{categoryId}", name="delete", methods={"DELETE"})
+     */
+    public function delete($categoryId)
+    {
+        $category = $this->getDoctrine()->getRepository(Category::class)->find($categoryId);
+
+        $doctrine = $this->getDoctrine()->getManager();
+        $doctrine->remove($category);
+        $doctrine->flush();
+
+        return $this->json(['deleted' => true]);
+    }
 }
