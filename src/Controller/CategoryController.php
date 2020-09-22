@@ -68,6 +68,26 @@ class CategoryController extends AbstractController
     }
 
     /**
+     * @Route("/{categoryId}", name="update", methods={"PUT"})
+     */
+    public function update($categoryId, Request $request)
+    {
+        $data = json_decode($request->getContent(), true);
+
+        $category = $this->getDoctrine()->getRepository(Category::class)->find($categoryId);
+
+        if(!empty($category) && !empty($data['name'])){
+            $category->setName($data['name']);
+
+            $doctrine = $this->getDoctrine()->getManager();
+            $doctrine->persist($category);
+            $doctrine->flush();
+        }
+
+        return $this->json($this->toDto($category));
+    }
+
+    /**
      * @Route("/{categoryId}", name="delete", methods={"DELETE"})
      */
     public function delete($categoryId)
