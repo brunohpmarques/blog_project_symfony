@@ -11,6 +11,11 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class UserController extends AbstractController
 {
+    private function encryptPassword($cleanText)
+    {
+        return md5($cleanText); //TODO change to other encrypt
+    }
+
     private function toDto($user)
     {
         if(is_null($user)){
@@ -61,12 +66,58 @@ class UserController extends AbstractController
         $user = new User();
         $user->setName($data['name']);
         $user->setEmail($data['email']);
-        $user->setPassword(md5($data['password'])); //TODO change to other encrypt
+        $user->setPassword($this->encryptPassword($data['password']));
 
         $doctrine = $this->getDoctrine()->getManager();
         $doctrine->persist($user);
         $doctrine->flush();
 
         return $this->json($this->toDto($user));
+    }
+
+    /**
+     * @Route("/{userId}", name="update", methods={"PUT"})
+     */
+    public function update($userId, Request $request)
+    {
+        $data = json_decode($request->getContent(), true);
+
+        $user = $this->getDoctrine()->getRepository(User::class)->find($userId);
+
+        if(empty($user)){
+            return null;
+        }
+
+        if(!empty($data['name'])){
+            $user->setName($data['name']);
+        }
+
+        if(!empty($data['email'])){
+            $user->setEmail($data['email']);
+        }
+
+        if(!empty($data['password'])){
+            $user->setPassword($this->encryptPassword($data['password']));
+        }
+
+        $doctrine = $this->getDoctrine()->getManager();
+        $doctrine->persist($user);
+        $doctrine->flush();
+
+        return $this->json($this->toDto($user));
+    }
+
+    /**
+     * @Route("/{userId}", name="delete", methods={"DELETE"})
+     */
+    public function delete($userId)
+    {
+        $user = $this->getDoctrine()->getRepository(User::class)->find($userId);
+
+        $doctrine = $this->getDoctrine()->getManager();
+        $doctrine->remove($user);
+        $doctrine->flush();
+
+        return $this->json(['deleted' => true]);
     }
 }
